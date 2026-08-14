@@ -47,6 +47,7 @@ const Navbar = () => {
 
       <Link to="/" style={linkStyle}>Home</Link>
       <Link to="/podcasts" style={linkStyle}>Podcasts</Link>
+      <Link to="/audiobooks" style={linkStyle}>Audiobooks</Link>
 
       {user && user.role === 'artist' && (
         <Link to="/artist/dashboard" style={linkStyle}>Dashboard</Link>

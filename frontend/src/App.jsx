@@ -10,7 +10,8 @@ import Playlists from './pages/Playlists';
 import Podcasts from './pages/Podcasts';
 import PodcastDetail from './pages/PodcastDetail';
 import Downloads from './pages/Downloads';
-
+import Audiobooks from './pages/Audiobooks';
+import AudiobookDetail from './pages/AudiobookDetail';
 
 function App() {
   return (
@@ -22,32 +23,35 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/podcasts" element={<Podcasts />} />
         <Route path="/podcasts/:id" element={<PodcastDetail />} />
+        <Route path="/audiobooks" element={<Audiobooks />} />
+        <Route path="/audiobooks/:id" element={<AudiobookDetail />} />
         <Route
-  path="/artist/dashboard"
-  element={
-    <ProtectedRoute allowedRole="artist">
-      <ArtistDashboard />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/playlists"
-  element={
-    <ProtectedRoute>
-      <Playlists />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/downloads"
-  element={
-    <ProtectedRoute>
-      <Downloads />
-    </ProtectedRoute>
-  }
-/>
+          path="/artist/dashboard"
+          element={
+            <ProtectedRoute allowedRole="artist">
+              <ArtistDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/playlists"
+          element={
+            <ProtectedRoute>
+              <Playlists />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/downloads"
+          element={
+            <ProtectedRoute>
+              <Downloads />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
-      
+
+      <PlayerBar />
     </>
   );
 }

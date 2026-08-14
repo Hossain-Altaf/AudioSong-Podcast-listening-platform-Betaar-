@@ -12,8 +12,8 @@ const Downloads = () => {
   }, []);
 
   const handlePlay = (song) => {
-    playSong(song);
-  };
+  playSong(song, songs, songs.findIndex((s) => s._id === song._id));
+};
 
   return (
     <div style={{ padding: '1rem' }}>

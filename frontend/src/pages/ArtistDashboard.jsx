@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { uploadSong } from '../services/songService';
 import { createPodcast } from '../services/podcastService';
+import { createAudiobook } from '../services/audiobookService';
 
 const ArtistDashboard = () => {
   const [formData, setFormData] = useState({
@@ -87,6 +88,45 @@ const handlePodcastSubmit = async (e) => {
     setPodcastError(err.response?.data?.message || 'Failed to create podcast');
   } finally {
     setCreatingPodcast(false);
+  }
+};
+
+  const [bookData, setBookData] = useState({
+  title: '',
+  author: '',
+  narrator: '',
+  description: '',
+  category: '',
+});
+const [bookCover, setBookCover] = useState(null);
+const [bookMessage, setBookMessage] = useState('');
+const [bookError, setBookError] = useState('');
+const [creatingBook, setCreatingBook] = useState(false);
+
+const handleBookChange = (e) => {
+  setBookData({ ...bookData, [e.target.name]: e.target.value });
+};
+
+const handleBookSubmit = async (e) => {
+  e.preventDefault();
+  setBookError('');
+  setBookMessage('');
+
+  const data = new FormData();
+  Object.entries(bookData).forEach(([key, val]) => data.append(key, val));
+  if (bookCover) data.append('cover', bookCover);
+
+  try {
+    setCreatingBook(true);
+    await createAudiobook(data);
+    setBookMessage('Audiobook created! Add chapters from the Audiobooks page.');
+    setBookData({ title: '', author: '', narrator: '', description: '', category: '' });
+    setBookCover(null);
+    e.target.reset();
+  } catch (err) {
+    setBookError(err.response?.data?.message || 'Failed to create audiobook');
+  } finally {
+    setCreatingBook(false);
   }
 };
 
@@ -208,6 +248,42 @@ const handlePodcastSubmit = async (e) => {
 
   <button type="submit" disabled={creatingPodcast}>
     {creatingPodcast ? 'Creating...' : 'Create Podcast'}
+  </button>
+</form>
+
+ <hr style={{ margin: '2rem 0', borderColor: 'var(--border)' }} />
+
+<h3>Create a New Audiobook</h3>
+{bookMessage && <p style={{ color: 'var(--success)' }}>{bookMessage}</p>}
+{bookError && <p style={{ color: 'var(--danger)' }}>{bookError}</p>}
+
+<form onSubmit={handleBookSubmit}>
+  <div style={{ marginBottom: '1rem' }}>
+    <label>Book Title</label><br />
+    <input type="text" name="title" value={bookData.title} onChange={handleBookChange} required />
+  </div>
+  <div style={{ marginBottom: '1rem' }}>
+    <label>Author</label><br />
+    <input type="text" name="author" value={bookData.author} onChange={handleBookChange} required />
+  </div>
+  <div style={{ marginBottom: '1rem' }}>
+    <label>Narrator (optional)</label><br />
+    <input type="text" name="narrator" value={bookData.narrator} onChange={handleBookChange} />
+  </div>
+  <div style={{ marginBottom: '1rem' }}>
+    <label>Description</label><br />
+    <textarea name="description" rows="4" value={bookData.description} onChange={handleBookChange} />
+  </div>
+  <div style={{ marginBottom: '1rem' }}>
+    <label>Category</label><br />
+    <input type="text" name="category" placeholder="e.g. Fiction, Self-Help, Sci-Fi" value={bookData.category} onChange={handleBookChange} required />
+  </div>
+  <div style={{ marginBottom: '1rem' }}>
+    <label>Cover Image (optional)</label><br />
+    <input type="file" accept="image/*" onChange={(e) => setBookCover(e.target.files[0])} />
+  </div>
+  <button type="submit" disabled={creatingBook}>
+    {creatingBook ? 'Creating...' : 'Create Audiobook'}
   </button>
 </form>
 

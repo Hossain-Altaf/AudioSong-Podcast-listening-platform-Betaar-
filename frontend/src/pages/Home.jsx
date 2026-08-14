@@ -25,8 +25,8 @@ const Home = () => {
   }, []);
 
   const handlePlay = (song) => {
-    playSong(song);
-  };
+  playSong(song, filteredSongs, filteredSongs.findIndex((s) => s._id === song._id));
+};
 
   if (loading) return <p>Loading songs...</p>;
   if (error) return <p>{error}</p>;

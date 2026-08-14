@@ -15,6 +15,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/songs', require('./routes/songRoutes'));
 app.use('/api/playlists', require('./routes/playlistRoutes'));
 app.use('/api/podcasts', require('./routes/podcastRoutes'));
+app.use('/api/audiobooks', require('./routes/audiobookRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running...');

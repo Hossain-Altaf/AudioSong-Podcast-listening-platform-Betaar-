@@ -67,7 +67,17 @@ const Playlists = () => {
             ) : (
               <ul>
                 {playlist.songs.map((song) => (
-                  <li key={song._id} style={{ cursor: 'pointer' }} onClick={() => playSong(song)}>
+                  <li
+                    key={song._id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() =>
+                      playSong(
+                        song,
+                        playlist.songs,
+                        playlist.songs.findIndex((s) => s._id === song._id)
+                      )
+                    }
+                  >
                     {song.title} — {song.artist?.name}
                   </li>
                 ))}
