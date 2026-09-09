@@ -10,7 +10,7 @@ const app = express();
 
 // app.use(cors());
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://betaar.vercel.app'],
+  origin: ['http://localhost:5173', 'betaar-frondend.vercel.app'],
   credentials: true,
 }));
 app.use(express.json());
