@@ -8,7 +8,11 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+// app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://betaar.vercel.app'],
+  credentials: true,
+}));
 app.use(express.json());
 
 app.use('/api/auth', require('./routes/authRoutes'));
