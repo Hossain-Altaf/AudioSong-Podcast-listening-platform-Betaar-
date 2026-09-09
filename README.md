@@ -33,7 +33,7 @@
 
 | Login | Register | Artist-reg |
 |----------|------------|-----------|
-| ![login](screenshots/login.png) | ![reg](screenshots/register.png) | ![Playlists](screenshots/register_artis.png) |
+| ![login](screenshots/login.png) | ![reg](screenshots/register.png) | ![Playlists](screenshots/register_artist.png) |
 
 ## 🛠 Tech Stack
 
