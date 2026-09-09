@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getPodcastById, addEpisode } from '../services/podcastService';
 import { PlayerContext } from '../context/PlayerContext';
 import { AuthContext } from '../context/AuthContext';
+import { pageWrap, eyebrow, card, fieldStyle, labelStyle, inputStyle, primaryButton } from '../styles/shared';
 
 const PodcastDetail = () => {
   const { id } = useParams();
@@ -36,7 +37,7 @@ const PodcastDetail = () => {
   const handlePlayEpisode = (episode) => {
     playSong({
       _id: episode._id,
-      title: episode.title,
+      title: `${podcast.title} — ${episode.title}`,
       audioUrl: episode.audioUrl,
       artist: podcast.host,
       coverImage: podcast.coverImage,
@@ -47,12 +48,10 @@ const PodcastDetail = () => {
     e.preventDefault();
     setEpError('');
     setEpMessage('');
-
     if (!epAudio) {
       setEpError('Please select an audio file');
       return;
     }
-
     const data = new FormData();
     data.append('title', epTitle);
     data.append('episodeNumber', epNumber);
@@ -74,85 +73,71 @@ const PodcastDetail = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p style={pageWrap}>Loading...</p>;
+  if (error) return <p style={pageWrap}>{error}</p>;
   if (!podcast) return null;
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+    <div style={{ ...pageWrap, maxWidth: '720px' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
         <img
           src={podcast.coverImage || 'https://via.placeholder.com/150'}
           alt={podcast.title}
-          style={{ width: '150px', borderRadius: '8px' }}
+          style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
         />
         <div>
-          <h2>{podcast.title}</h2>
-          <p style={{ color: '#666' }}>{podcast.host?.name}</p>
-          <p>{podcast.description}</p>
-          <p style={{ fontSize: '0.85rem', color: '#999' }}>{podcast.category}</p>
+          <p style={eyebrow}>{podcast.category}</p>
+          <h1 style={{ margin: '0.2rem 0' }}>{podcast.title}</h1>
+          <p style={{ color: 'var(--text-muted)', margin: '0.2rem 0' }}>Hosted by {podcast.host?.name}</p>
+          <p style={{ marginTop: '0.6rem' }}>{podcast.description}</p>
         </div>
       </div>
 
-      <h3>Episodes</h3>
+      <h3 style={{ marginBottom: '0.75rem' }}>Episodes</h3>
       {podcast.episodes.length === 0 ? (
-        <p>No episodes yet.</p>
+        <p style={{ color: 'var(--text-muted)' }}>No episodes yet.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {podcast.episodes.map((ep) => (
-            <li
+        <div style={{ ...card, padding: '0.5rem 1rem' }}>
+          {podcast.episodes.map((ep, i) => (
+            <div
               key={ep._id}
               onClick={() => handlePlayEpisode(ep)}
               style={{
-                padding: '0.75rem',
-                borderBottom: '1px solid #eee',
+                padding: '0.85rem 0',
+                borderBottom: i < podcast.episodes.length - 1 ? '1px solid var(--border)' : 'none',
                 cursor: 'pointer',
+                display: 'flex',
+                gap: '0.75rem',
+                alignItems: 'center',
               }}
             >
-              Ep {ep.episodeNumber}: {ep.title}
-            </li>
+              <span style={{ color: 'var(--accent)', fontWeight: 600, minWidth: '24px' }}>{ep.episodeNumber}</span>
+              <span>{ep.title}</span>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
       {user && podcast.host?._id === user._id && (
-        <div style={{ marginTop: '2rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
-          <h3>Add Episode</h3>
-          {epMessage && <p style={{ color: 'green' }}>{epMessage}</p>}
-          {epError && <p style={{ color: 'red' }}>{epError}</p>}
+        <div style={{ ...card, padding: '1.5rem', marginTop: '2rem' }}>
+          <h3 style={{ marginBottom: '1rem' }}>Add Episode</h3>
+          {epMessage && <p style={{ color: 'var(--success)' }}>{epMessage}</p>}
+          {epError && <p style={{ color: 'var(--danger)' }}>{epError}</p>}
 
           <form onSubmit={handleAddEpisode}>
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label>Episode Title</label><br />
-              <input
-                type="text"
-                value={epTitle}
-                onChange={(e) => setEpTitle(e.target.value)}
-                required
-              />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Episode Title</label>
+              <input style={inputStyle} type="text" value={epTitle} onChange={(e) => setEpTitle(e.target.value)} required />
             </div>
-
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label>Episode Number</label><br />
-              <input
-                type="number"
-                value={epNumber}
-                onChange={(e) => setEpNumber(e.target.value)}
-                required
-              />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Episode Number</label>
+              <input style={inputStyle} type="number" value={epNumber} onChange={(e) => setEpNumber(e.target.value)} required />
             </div>
-
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label>Audio File</label><br />
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => setEpAudio(e.target.files[0])}
-                required
-              />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Audio File</label><br />
+              <input type="file" accept="audio/*" onChange={(e) => setEpAudio(e.target.files[0])} required />
             </div>
-
-            <button type="submit" disabled={uploadingEp}>
+            <button type="submit" disabled={uploadingEp} style={primaryButton}>
               {uploadingEp ? 'Uploading...' : 'Add Episode'}
             </button>
           </form>

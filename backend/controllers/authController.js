@@ -1,6 +1,53 @@
 const User = require('../models/User');
 const generateToken = require('../config/generateToken');
 
+// @desc  Get logged-in user's profile
+// @route GET /api/auth/profile
+const getProfile = async (req, res) => {
+  res.json(req.user);
+};
+
+// @desc  Update logged-in user's profile
+// @route PUT /api/auth/profile
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.name = req.body.name || user.name;
+    user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
+
+    if (req.body.email && req.body.email !== user.email) {
+      const emailTaken = await User.findOne({ email: req.body.email });
+      if (emailTaken) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+      user.email = req.body.email;
+    }
+
+    if (req.files?.profilePicture) {
+      user.profilePicture = req.files.profilePicture[0].path;
+    }
+
+    if (req.body.password) {
+      user.password = req.body.password; // pre('save') hook will hash it
+    }
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      bio: updatedUser.bio,
+      profilePicture: updatedUser.profilePicture,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc  Register new user
 // @route POST /api/auth/register
 const registerUser = async (req, res) => {
@@ -55,4 +102,5 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+
+module.exports = { registerUser, loginUser, getProfile, updateProfile };

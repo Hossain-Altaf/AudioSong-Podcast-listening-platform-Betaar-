@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { getAudiobookById, addChapter } from '../services/audiobookService';
 import { PlayerContext } from '../context/PlayerContext';
 import { AuthContext } from '../context/AuthContext';
+import { pageWrap, eyebrow, card, fieldStyle, labelStyle, inputStyle, primaryButton } from '../styles/shared';
 
 const AudiobookDetail = () => {
   const { id } = useParams();
@@ -47,12 +48,10 @@ const AudiobookDetail = () => {
     e.preventDefault();
     setChError('');
     setChMessage('');
-
     if (!chAudio) {
       setChError('Please select an audio file');
       return;
     }
-
     const data = new FormData();
     data.append('title', chTitle);
     data.append('chapterNumber', chNumber);
@@ -74,28 +73,28 @@ const AudiobookDetail = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p style={pageWrap}>Loading...</p>;
+  if (error) return <p style={pageWrap}>{error}</p>;
   if (!book) return null;
 
   return (
-    <div style={{ padding: '1.5rem 2rem', maxWidth: '700px' }}>
-      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1.5rem' }}>
+    <div style={{ ...pageWrap, maxWidth: '720px' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '2rem' }}>
         <img
           src={book.coverImage || 'https://via.placeholder.com/150'}
           alt={book.title}
-          style={{ width: '150px', borderRadius: 'var(--radius-lg)', objectFit: 'cover' }}
+          style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }}
         />
         <div>
-          <h2>{book.title}</h2>
-          <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0' }}>by {book.author}</p>
+          <p style={eyebrow}>{book.category}</p>
+          <h1 style={{ margin: '0.2rem 0' }}>{book.title}</h1>
+          <p style={{ color: 'var(--text-muted)', margin: '0.2rem 0' }}>by {book.author}</p>
           {book.narrator && (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.2rem 0' }}>
               Narrated by {book.narrator}
             </p>
           )}
           <p style={{ marginTop: '0.6rem' }}>{book.description}</p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--accent)' }}>{book.category}</p>
         </div>
       </div>
 
@@ -103,46 +102,50 @@ const AudiobookDetail = () => {
       {book.chapters.length === 0 ? (
         <p style={{ color: 'var(--text-muted)' }}>No chapters yet.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <div style={{ ...card, padding: '0.5rem 1rem' }}>
           {book.chapters
             .slice()
             .sort((a, b) => a.chapterNumber - b.chapterNumber)
-            .map((ch) => (
-              <li
+            .map((ch, i, arr) => (
+              <div
                 key={ch._id}
                 onClick={() => handlePlayChapter(ch)}
                 style={{
-                  padding: '0.75rem 0',
-                  borderBottom: '1px solid var(--border)',
+                  padding: '0.85rem 0',
+                  borderBottom: i < arr.length - 1 ? '1px solid var(--border)' : 'none',
                   cursor: 'pointer',
+                  display: 'flex',
+                  gap: '0.75rem',
+                  alignItems: 'center',
                 }}
               >
-                Chapter {ch.chapterNumber}: {ch.title}
-              </li>
+                <span style={{ color: 'var(--accent)', fontWeight: 600, minWidth: '24px' }}>{ch.chapterNumber}</span>
+                <span>{ch.title}</span>
+              </div>
             ))}
-        </ul>
+        </div>
       )}
 
       {user && book.uploadedBy?._id === user._id && (
-        <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-          <h3 style={{ marginBottom: '0.75rem' }}>Add Chapter</h3>
+        <div style={{ ...card, padding: '1.5rem', marginTop: '2rem' }}>
+          <h3 style={{ marginBottom: '1rem' }}>Add Chapter</h3>
           {chMessage && <p style={{ color: 'var(--success)' }}>{chMessage}</p>}
           {chError && <p style={{ color: 'var(--danger)' }}>{chError}</p>}
 
           <form onSubmit={handleAddChapter}>
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label>Chapter Title</label><br />
-              <input type="text" value={chTitle} onChange={(e) => setChTitle(e.target.value)} required />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Chapter Title</label>
+              <input style={inputStyle} type="text" value={chTitle} onChange={(e) => setChTitle(e.target.value)} required />
             </div>
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label>Chapter Number</label><br />
-              <input type="number" value={chNumber} onChange={(e) => setChNumber(e.target.value)} required />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Chapter Number</label>
+              <input style={inputStyle} type="number" value={chNumber} onChange={(e) => setChNumber(e.target.value)} required />
             </div>
-            <div style={{ marginBottom: '0.75rem' }}>
-              <label>Audio File</label><br />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>Audio File</label><br />
               <input type="file" accept="audio/*" onChange={(e) => setChAudio(e.target.files[0])} required />
             </div>
-            <button type="submit" disabled={uploadingCh}>
+            <button type="submit" disabled={uploadingCh} style={primaryButton}>
               {uploadingCh ? 'Uploading...' : 'Add Chapter'}
             </button>
           </form>

@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
+
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -50,13 +51,17 @@ const Navbar = () => {
       <Link to="/audiobooks" style={linkStyle}>Audiobooks</Link>
 
       {user && user.role === 'artist' && (
+        <>
         <Link to="/artist/dashboard" style={linkStyle}>Dashboard</Link>
+        
+        </>
       )}
 
       {user && (
         <>
           <Link to="/playlists" style={linkStyle}>Playlists</Link>
           <Link to="/downloads" style={linkStyle}>Downloads</Link>
+          <Link to="/profile" style={linkStyle}>Profile</Link>
         </>
       )}
 

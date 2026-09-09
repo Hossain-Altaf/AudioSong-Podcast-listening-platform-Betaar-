@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { getMyPlaylists, addSongToPlaylist } from '../services/playlistService';
 import { downloadSong, removeDownload, isDownloaded } from '../services/offlineService';
+import { mediaCard } from '../styles/shared';
 
 const SongCard = ({ song, onPlay }) => {
   const { user } = useContext(AuthContext);
@@ -9,6 +10,7 @@ const SongCard = ({ song, onPlay }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [downloaded, setDownloaded] = useState(isDownloaded(song._id));
   const [downloading, setDownloading] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     if (showDropdown && user) {
@@ -44,44 +46,98 @@ const SongCard = ({ song, onPlay }) => {
 
   return (
     <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        padding: '0.75rem',
-        width: '160px',
+        ...mediaCard,
         position: 'relative',
+        borderColor: hovered ? 'var(--accent)' : 'var(--border)',
       }}
     >
-      <img
-        src={song.coverImage || 'https://via.placeholder.com/150'}
-        alt={song.title}
-        style={{ width: '100%', borderRadius: '4px', cursor: 'pointer' }}
-        onClick={() => onPlay(song)}
-      />
-      <h4 style={{ margin: '0.5rem 0 0.2rem' }}>{song.title}</h4>
-      <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>
+      <div style={{ position: 'relative' }}>
+        <img
+          src={song.coverImage || 'https://via.placeholder.com/150'}
+          alt={song.title}
+          onClick={() => onPlay(song)}
+          style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 'var(--radius)', cursor: 'pointer' }}
+        />
+        {hovered && (
+          <div
+            onClick={() => onPlay(song)}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0,0,0,0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 'var(--radius)',
+              cursor: 'pointer',
+            }}
+          >
+            <div style={{
+              background: 'var(--accent)',
+              color: '#121212',
+              width: '42px',
+              height: '42px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.1rem',
+            }}>
+              ▶
+            </div>
+          </div>
+        )}
+      </div>
+
+      <h4 style={{ margin: '0.65rem 0 0.15rem', fontSize: '0.92rem' }}>{song.title}</h4>
+      <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
         {song.artist?.name || 'Unknown Artist'}
       </p>
 
       {user && (
-        <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-          <button onClick={() => setShowDropdown(!showDropdown)}>+ Playlist</button>
-          <button onClick={handleDownloadToggle} disabled={downloading}>
-            {downloading ? '...' : downloaded ? '✓ Downloaded' : '⬇ Download'}
+        <div style={{ marginTop: '0.6rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setShowDropdown(!showDropdown)}
+            style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}
+          >
+            + Playlist
+          </button>
+          <button
+            onClick={handleDownloadToggle}
+            disabled={downloading}
+            style={{
+              fontSize: '0.75rem',
+              padding: '0.3rem 0.6rem',
+              color: downloaded ? 'var(--accent)' : 'var(--text)',
+            }}
+          >
+            {downloading ? '...' : downloaded ? '✓ Saved' : '⬇ Download'}
           </button>
         </div>
       )}
 
       {showDropdown && (
-        <div style={{ border: '1px solid #ccc', marginTop: '0.3rem', background: '#fff' }}>
+        <div style={{
+          position: 'absolute',
+          zIndex: 10,
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+          marginTop: '0.3rem',
+          width: '150px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+        }}>
           {playlists.length === 0 ? (
-            <p style={{ fontSize: '0.8rem', padding: '0.3rem' }}>No playlists yet</p>
+            <p style={{ fontSize: '0.78rem', padding: '0.5rem', margin: 0, color: 'var(--text-muted)' }}>No playlists yet</p>
           ) : (
             playlists.map((p) => (
               <div
                 key={p._id}
-                style={{ padding: '0.3rem', cursor: 'pointer', fontSize: '0.85rem' }}
                 onClick={() => handleAdd(p._id)}
+                style={{ padding: '0.5rem 0.6rem', cursor: 'pointer', fontSize: '0.82rem' }}
               >
                 {p.name}
               </div>

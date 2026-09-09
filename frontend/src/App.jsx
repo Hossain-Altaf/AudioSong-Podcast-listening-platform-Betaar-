@@ -12,6 +12,7 @@ import PodcastDetail from './pages/PodcastDetail';
 import Downloads from './pages/Downloads';
 import Audiobooks from './pages/Audiobooks';
 import AudiobookDetail from './pages/AudiobookDetail';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -49,6 +50,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
 
       <PlayerBar />

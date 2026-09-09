@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { getSongs } from '../services/songService';
 import SongCard from '../components/SongCard';
 import { PlayerContext } from '../context/PlayerContext';
+import { pageWrap, eyebrow, grid } from '../styles/shared';
 
 const Home = () => {
   const [songs, setSongs] = useState([]);
@@ -24,35 +25,35 @@ const Home = () => {
     fetchSongs();
   }, []);
 
-  const handlePlay = (song) => {
-  playSong(song, filteredSongs, filteredSongs.findIndex((s) => s._id === song._id));
-};
-
-  if (loading) return <p>Loading songs...</p>;
-  if (error) return <p>{error}</p>;
-
-  // Build a unique genre list from the songs we have
-  const genres = ['All', ...new Set(songs.map((s) => s.genre).filter(Boolean))];
-
   const filteredSongs =
     selectedGenre === 'All' ? songs : songs.filter((s) => s.genre === selectedGenre);
 
-  return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Browse by Category</h2>
+  const handlePlay = (song) => {
+    playSong(song, filteredSongs, filteredSongs.findIndex((s) => s._id === song._id));
+  };
 
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+  if (loading) return <p style={pageWrap}>Loading songs...</p>;
+  if (error) return <p style={pageWrap}>{error}</p>;
+
+  const genres = ['All', ...new Set(songs.map((s) => s.genre).filter(Boolean))];
+
+  return (
+    <div style={pageWrap}>
+      <p style={eyebrow}>Discover</p>
+      <h1 style={{ margin: '0.2rem 0 1.5rem' }}>Browse Music</h1>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
         {genres.map((genre) => (
           <button
             key={genre}
             onClick={() => setSelectedGenre(genre)}
             style={{
-              padding: '0.4rem 0.9rem',
+              padding: '0.4rem 1rem',
               borderRadius: '20px',
-              border: '1px solid #ccc',
-              background: selectedGenre === genre ? '#1db954' : '#fff',
-              color: selectedGenre === genre ? '#fff' : '#333',
-              cursor: 'pointer',
+              background: selectedGenre === genre ? 'var(--accent)' : 'var(--surface)',
+              color: selectedGenre === genre ? '#121212' : 'var(--text)',
+              fontWeight: selectedGenre === genre ? 600 : 400,
+              border: selectedGenre === genre ? 'none' : '1px solid var(--border)',
             }}
           >
             {genre}
@@ -60,11 +61,14 @@ const Home = () => {
         ))}
       </div>
 
-      <h2>{selectedGenre === 'All' ? 'All Songs' : selectedGenre}</h2>
+      <h3 style={{ marginBottom: '1rem' }}>
+        {selectedGenre === 'All' ? 'All Songs' : selectedGenre}
+      </h3>
+
       {filteredSongs.length === 0 ? (
-        <p>No songs in this category.</p>
+        <p style={{ color: 'var(--text-muted)' }}>No songs in this category.</p>
       ) : (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={grid}>
           {filteredSongs.map((song) => (
             <SongCard key={song._id} song={song} onPlay={handlePlay} />
           ))}
